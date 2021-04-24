@@ -8,3 +8,4 @@ jspm_packages
 *.pptx
 .vs
 .build
+.env

@@ -1,0 +1,25 @@
+npx - perquisa os modulos instalados
+npx sls create --template aws-nodejs --name command-dispag
+npx sls create --template aws-nodejs --name command-dispag --path /\zcxxz
+npx sls offline start
+npx sls deploy
+npx serverless config credentials --provider aws --key AKXXXXXXXX3725YYUHZ2 --secret aH5/NMXXXXSG+Hjk/aOPQWER+1v2xxxxxxxxEAHB0
+-
+
+  query-dispag-lb:
+	name: query-dipag
+	handler: query-dispag/handler.sim
+
+
+#New Project
+	npm init 
+	npx sls create --template aws-nodejs --name[service]
+	
+	npm i -D serverless-dotenv-plugin
+	npm install serverless-offline --save-dev
+	npm install --save-dev serverless-jest-plugin
+	
+	npm install kafka-node  
+	npm install jsonwebtoken
+	npm install uuid
+	npm install body-parser

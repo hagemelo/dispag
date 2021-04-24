@@ -1,0 +1,23 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 20
+      arrivalRate: 2
+  processor: "novodebitoteste.js"     
+scenarios:
+  - name: "Gerar Novo Debito com Autenticacao"
+    flow:
+        - think: 2
+        - post:
+            name: "TESTE"
+            url: "/exemplorest"
+            headers: 
+                Content-Type: "application/json"
+            json:
+                nome: "Primeiro"
+                valor: "{{ valor }}"
+            beforeRequest: "logRequest"
+            afterResponse: "logResponse"
+        - log: "Current environment is set to: {{ $arrivalRate }}"
+    
+          

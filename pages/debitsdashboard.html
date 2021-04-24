@@ -1,0 +1,263 @@
+<html ng-app="debitsdashboard">
+<head>
+	<meta charset="UTF-8">
+    <link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css" />
+	<script src="lib/angular/angular.min.js"/></script>
+	<script src="lib/angular/angular-resource.min.js"/></script>
+	<script src="lib/angular/angular-route.min.js"/></script>
+	<script src="lib/angular/angular-cookies.min.js"/></script>
+	<script src="lib/angular/angular-sanitize.min.js"/></script>
+	<script src="lib/angular/angular-touch.min.js"/></script>
+	<script src="lib/angular/angular-animate.min.js"/></script>
+  	<script src="debitsdashboard.js"/></script>
+
+</head>
+
+<body ng-controller="debitsdashboardcontroller" class="text-center">
+
+	<div class="container border border-primary">
+		<nav aria-label="breadcrumb">
+		  <ol class="breadcrumb">
+			<li class="breadcrumb-item"><a href="#">Novo Débito</a></li>
+			<li class="breadcrumb-item"><a href="#">Anual</a></li>
+			<li class="breadcrumb-item active" aria-current="page">Débitos Atuais</li>
+		  </ol>
+		</nav>
+		<h1 class="display-4">Dispag</h1>
+		<div class="row">
+			
+			<div class="col"  ng-repeat="debito in debitosdados.debitos">
+				<div class="card" style="width: 18rem;">
+				  <div class="card-body">
+					<h5 class="card-title">{{debito.nome}}</h5>
+					<h6 class="card-subtitle mb-2 text-muted"> <span class="badge badge-info">{{debito.valor}}</span> </h6>
+					<p class="card-text">
+						<div class="list-group">
+						   <li class=list-group-item list-group-item-action align-items-left" ng-repeat="cat in debito.cat">{{cat.nome}} 
+						    <span class="badge badge-light badge-pill"> {{cat.valor}}</span>
+						   </li>
+						</div>				
+					</p>
+					<a href="#" class="card-link"  ng-click="mostrardetalhes(debito.nome)">Detalhes</a>
+					<a href="#" class="card-link" data-toggle="modal" data-target="#novoDebitoModal">Novo Débito</a>
+				  </div>
+				</div>
+			</div>
+			
+		</div>
+	
+	</div>
+	
+	
+	
+	<div class="container border border-primary" ng-show="debitosdados.showDetalhes">
+		<h6>Detalhes</h6>
+		<div class="row" >
+			<div class="col">
+			
+
+				<div class="row">
+				  <div class="col-3">
+					<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+					  <a class="nav-link active" id="v-pills-basico-tab" data-toggle="pill" href="#v-pills-basico" role="tab" aria-controls="v-pills-basico" aria-selected="true">Básicos</a>
+					  <a class="nav-link" id="v-pills-recorrente-tab" data-toggle="pill" href="#v-pills-recorrente" role="tab" aria-controls="v-pills-recorrente" aria-selected="false">Recorrentes</a>
+					  <a class="nav-link" id="v-pills-avulsos-tab" data-toggle="pill" href="#v-pills-avulsos" role="tab" aria-controls="v-pills-avulsos" aria-selected="false">Avúlsos</a>
+					</div>
+				  </div>
+				  <div class="col-9">
+					<div class="tab-content" id="v-pills-tabContent">
+					  <div class="tab-pane fade show active" id="v-pills-basico" role="tabpanel" aria-labelledby="v-pills-basico-tab">
+						<table class="table"  ng-show="debitosdados.detalhesDebitosBasicos.length!=0">
+						  <thead>
+							<tr>
+							  <th scope="col">Vencimento</th>
+							  <th scope="col">Descricao</th>
+							  <th scope="col">Valor</th>
+							  <th scope="col">Situação</th>
+							</tr>
+						  </thead>
+						  <tbody>
+							<tr ng-repeat="basico in debitosdados.detalhesDebitosBasicos">
+							  <th scope="row">{{basico.vencimento}}</th>
+							  <td>{{basico.descricao}}</td>
+							  <td>{{basico.valor}}</td>
+							  <td>
+								  <span class="badge badge-light badge-pill" ng-show="basico.status == 'PAGO'" > {{basico.status}}</span>
+								  <span class="badge badge-info badge-pill" ng-show="basico.status == 'À VENCER'" > {{basico.status}}</span>
+								  <span class="badge badge-danger badge-pill" ng-show="basico.status == 'ATRASADO'" > {{basico.status}}</span>
+								  <input type="image" src="imagens/pay.png" title="Pagar" ng-show="basico.status != 'PAGO'" ng-click="pedidopronto(pedido)"/>
+								  <input type="image" src="imagens/trash.png" title="Excluir" ng-click="pedidopronto(pedido)"/>
+							  </td>
+							</tr>
+						  </tbody>
+						</table>
+						<div class="alert alert-light" role="alert"  ng-show="debitosdados.detalhesDebitosBasicos.length==0">
+						  Não Há Registros!!!
+						</div>
+					  </div>
+					  <div class="tab-pane fade" id="v-pills-recorrente" role="tabpanel" aria-labelledby="v-pills-recorrente-tab">
+						<table class="table" ng-show="debitosdados.detalhesDebitosRecorrentes.length!=0">
+						  <thead>
+							<tr>
+							  <th scope="col">Vencimento</th>
+							  <th scope="col">Descricao</th>
+							  <th scope="col">Valor</th>
+							  <th scope="col">Situação</th>
+							</tr>
+						  </thead>
+						  <tbody>
+							<tr ng-repeat="recorrente in debitosdados.detalhesDebitosRecorrentes">
+							  <th scope="row">{{recorrente.vencimento}}</th>
+							  <td>{{recorrente.descricao}}</td>
+							  <td>{{recorrente.valor}}</td>
+							  <td>
+								<span class="badge badge-light badge-pill" ng-show="recorrente.status == 'PAGO'" > {{recorrente.status}}</span>
+								<span class="badge badge-info badge-pill" ng-show="recorrente.status == 'À VENCER'" > {{recorrente.status}}</span>
+								<span class="badge badge-danger badge-pill" ng-show="recorrente.status == 'ATRASADO'" > {{recorrente.status}}</span>
+								<input type="image" src="imagens/pay.png" title="Pagar" ng-show="recorrente.status != 'PAGO'" ng-click="pedidopronto(pedido)"/>
+								<input type="image" src="imagens/trash.png" title="Excluir" ng-click="pedidopronto(pedido)"/>
+							  </td>
+							</tr>
+						  </tbody>
+						</table>
+						<div class="alert alert-light" role="alert"  ng-show="debitosdados.detalhesDebitosRecorrentes.length==0">
+						  Não Há Registros!!!
+						</div>
+					  
+					  </div>
+					  <div class="tab-pane fade" id="v-pills-avulsos" role="tabpanel" aria-labelledby="v-pills-avulsos-tab">
+					  	<table class="table"  ng-show="debitosdados.detalhesDebitosAvulsos.length!=0">
+						  <thead>
+							<tr>
+							  <th scope="col">Vencimento</th>
+							  <th scope="col">Descricao</th>
+							  <th scope="col">Valor</th>
+							  <th scope="col">Situação</th>
+							</tr>
+						  </thead>
+						  <tbody>
+							<tr ng-repeat="avulso in debitosdados.detalhesDebitosAvulsos">
+							  <th scope="row">{{avulso.vencimento}}</th>
+							  <td>{{avulso.descricao}}</td>
+							  <td>{{avulso.valor}}</td>
+							  <td>
+								<span class="badge badge-light badge-pill" ng-show="avulso.status == 'PAGO'" > {{avulso.status}}</span>
+								<span class="badge badge-info badge-pill" ng-show="avulso.status == 'À VENCER'" > {{avulso.status}}</span>
+								<span class="badge badge-danger badge-pill" ng-show="avulso.status == 'ATRASADO'" > {{avulso.status}}</span>
+								<input type="image" src="imagens/pay.png" title="Pagar" ng-show="avulso.status != 'PAGO'" ng-click="pedidopronto(pedido)"/>
+								<input type="image" src="imagens/trash.png" title="Excluir" ng-click="pedidopronto(pedido)"/>
+							  </td>
+							</tr>
+						  </tbody>
+						</table>
+						<div class="alert alert-light" role="alert"  ng-show="debitosdados.detalhesDebitosAvulsos.length==0">
+						  Não Há Registros!!!
+						</div>
+					  
+					  
+					  </div>
+					</div>
+				  </div>
+				</div>
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			</div>
+		</div>
+		
+	</div>	
+	
+	
+	<div class="modal fade" id="novoDebitoModal" tabindex="-1" role="dialog" aria-labelledby="novoDebitoModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="novoDebitoModalLabel">Novo Débito</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		  <div class="modal-body">
+			
+			
+			
+			<form  name="novodebitoform" class="my-form">
+			  <div class="form-row">
+				<div class="col-md-5 mb-3">
+				  <label for="fielvencimento">Vencimento</label>
+				  <input type="text" class="form-control"  name="fielvencimento"  ng-model="debitosdados.novoDebito.vencimento" required >
+				</div>
+				<div class="col-md-5 mb-3">
+					<label for="tipodebitoFormControlSelect1">Tipo</label>
+					<select class="custom-select" id="tipodebitoFormControlSelect1" name="tipodebitoFormControlSelect1" ng-model="debitosdados.novoDebito.tipo" >
+						<option ng-repeat="tipo in debitosdados.tiposDebitos">{{tipo}}</option>
+					</select>
+				 
+				</div>
+			 </div>   
+			 <div class="form-row">	
+				
+				<div class="col-md-5 mb-3">
+					<label for="descricaoFormControlSelect2">Derscrição</label>
+					<select class="custom-select" id="descricaoFormControlSelect2" ng-model="debitosdados.novoDebito.descricao" ng-show="debitosdados.novoDebito.tipo == 'Básicos'">
+						<option ng-repeat="descbasicos in debitosdados.debitosBasicos">{{descbasicos}}</option>
+					</select>
+					<input type="text" class="form-control"  name="fieldescricao"  ng-model="debitosdados.novoDebito.descricao" ng-show="debitosdados.novoDebito.tipo != 'Básicos'" required >
+						 
+				</div>
+				
+				<div class="col-md-5 mb-3">
+					<label for="descricaoFormControlSelect2">Valor</label>
+					<input type="text" class="form-control"  name="fielvalor"  ng-model="debitosdados.novoDebito.valor" required >
+						 
+				</div>
+				
+				<div class="col-md-2 mb-3" ng-show="debitosdados.novoDebito.tipo != 'Básicos'">
+					<label for="descricaoFormControlSelect2">Parcela</label>
+					<input type="text" class="form-control"  name="fielparcela"  ng-model="debitosdados.novoDebito.parcela">
+						 
+				</div>
+			  </div>
+			 
+			</form>
+			
+			
+			
+			
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			<button type="button" class="btn btn-primary">Save changes</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	
+	
+	<script src="lib/bootstrap/jquery-3.2.1.slim.min.js"></script>
+	<script src="lib/bootstrap/tooltip.min.js"></script>
+	<script src="lib/bootstrap/popper.min.js"></script>
+	<script src="lib/bootstrap/bootstrap.min.js"></script>
+	 <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
+</body>
+</html>

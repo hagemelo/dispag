@@ -1,55 +1,29 @@
 'use strict';
 var jwt = require('jsonwebtoken') // package jwt 
 const uuid = require ("uuid");
+const {authenticate} = require('../repository/usuarioRepository')
+const {responseCode: respcod}  = require('../conf/response-code')
+
+
+const getToken = data =>{
+  
+  const token =  jwt.sign({ id: data.user, senha: data.passwd }, process.env.SECRET, {
+    expiresIn: 86400 // validade do token, 24hrs
+   })
+
+  return respcod.autenticadoReturn(token, data.user, uuid.v1())
+}
 
 module.exports.login = async event => {
   
-  const data = JSON.parse(event.body);
-
-
+  const data = JSON.parse(event.body)
   console.log('Usuário::' + data.user)
-  console.log('Usuário::' + data.passwd)
-  var token = jwt.sign({ id: data.user, senha: data.passwd }, process.env.SECRET, {
-						 expiresIn: 86400 // validade do token, 24hrs
-						});
-  
-  return {
-    statusCode: 200,
-    headers: {
-      'token': token,
-    },
-    body: JSON.stringify(
-      {
-        authentication: true,
-		    user: data.user,
-        "uuid": uuid.v1()
-      },
-      null,
-      2
-    ),
-  };
-};
-
-
-
-module.exports.loginteste = async event => {
-  
-  const data = JSON.parse(event.body);
-
-
-  console.log(data)
-  
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      {
-        message: 'OK',
-         },
-      null,
-      2
-    ),
-  };
-};
+  let result
+  await authenticate(data)
+          .then(res => res? result = getToken(data): result = respcod.naoAutenticadoReturn() )
+          .catch(()=> result = respcod.naoAutenticadoReturn() )
+  return result
+}
 
 module.exports.verificartk = async event => {
   
@@ -60,8 +34,7 @@ module.exports.verificartk = async event => {
   jwt.verify(token, process.env.SECRET, function(err, decoded) {      
     if (err) 
       return res.status(500).send({ auth: false, message: 'Falha ao autenticar o token' });    
-
-   
+  
   });
 
   return {

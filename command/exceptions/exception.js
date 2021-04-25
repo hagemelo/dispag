@@ -6,6 +6,7 @@ const PUSHTOPICERROR = "Error ao push Topic"
 const AUSENCIAHEADERSFUNDAMENTAISERROR = "Ausencia de Headers Fundamentais"
 const TOKENEXPIRADOERROR = "Token expirado error"
 const PUSHTOPICKAFKAERROR = "Push topic Kafak error"
+const NAOEUTENTICARERROR = "Error ao Autenticar"
 
 function printError(obj){
   console.error(obj.name)
@@ -75,6 +76,7 @@ class PushTopicError extends Error {
     printError(this)
   }
 }
+
 
 
 

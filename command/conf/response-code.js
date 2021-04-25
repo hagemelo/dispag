@@ -57,7 +57,7 @@ let responseCode = {
             body: JSON.stringify(
               {
                 auth: false,
-                message: 'Falha ao autenticar o token'
+                message: 'Falha ao autenticar'
               },
               null,
               2
@@ -96,7 +96,39 @@ let responseCode = {
           }
     },
 
+    autenticadoReturn : function (token, user, uuid){
+        
+      return {
+            statusCode: OK,
+            headers: {
+              'token': token,
+            },
+            body: JSON.stringify(
+              {
+                authentication: true,
+                user: user,
+                "uuid": uuid
+              },
+              null,
+              2
+            ),
+          }
+    },
 
+    naoAutenticadoReturn : function (){
+        
+      return {
+            statusCode: UNAUTHORIZED,
+            body: JSON.stringify(
+              {
+                auth: false,
+                message: 'Nao Autenticado'
+              },
+              null,
+              2
+            ),
+          }
+    },
 
 }
 

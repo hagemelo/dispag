@@ -1,7 +1,6 @@
 //'use strict';
 const kafka = require('kafka-node')
 const bp = require('body-parser')
-const config = require('./config')
 const respcod = require('../conf/response-code')
 const {pagardebito_error: PagarDebitoError} = require('../exceptions')
 const client = new kafka.KafkaClient({kafkaHost: process.env.KAFKA_SERVER})

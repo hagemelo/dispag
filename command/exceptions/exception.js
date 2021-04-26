@@ -68,18 +68,6 @@ class TokenExpiradoError extends Error {
   }
 }
 
-class PushTopicError extends Error {
-  constructor(message) {
-    super(message)
-    this.name = PUSHTOPICKAFKAERROR
-    Object.setPrototypeOf(this, PushTopicError.prototype)
-    printError(this)
-  }
-}
-
-
-
-
 module.exports = {
   NovoDebitoError,
   ExcluirDebitoError,
@@ -87,6 +75,5 @@ module.exports = {
   PushTopicError,
   AusenciaHeadersFundamentaisError,
   TokenExpiradoError,
-  PushTopicError
 }
 

@@ -4,10 +4,9 @@ const kafka = require('kafka-node')
 const client = new kafka.KafkaClient({kafkaHost: process.env.KAFKA_SERVER})
 const jwt = require('jsonwebtoken')
 //# Class Exxeptions
-const {PushTopicError: commandException} = require('../exceptions/exception')
 const {TokenExpiradoError: TokenExpiradoError} = require('../exceptions/exception')
 const {AusenciaHeadersFundamentaisError: AusenciaHeadersFundamentaisError} = require('../exceptions/exception')
-const {PushTopicError: PushTopicError} = require('../exceptions/exception')
+const {PushTopicError} = require('../exceptions/exception')
 
 
 const isKafkaOn = async ()=>{
@@ -59,7 +58,7 @@ const pushTopic = payloads =>{
     })
   })
   producer.on('error', function () {
-    throw new commandException("Erro in (" +payloads.topic + ")")
+    throw new PushTopicError("Erro in (" +payloads.topic + ")")
   })
   
 }

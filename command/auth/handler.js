@@ -1,7 +1,7 @@
 'use strict';
 var jwt = require('jsonwebtoken') // package jwt 
 const uuid = require ("uuid");
-const {authenticate} = require('../repository/usuarioRepository')
+const usuarioRepository = require('../repository/usuarioRepository')
 const {responseCode: respcod}  = require('../conf/response-code')
 
 
@@ -14,18 +14,22 @@ const getToken = data =>{
   return respcod.autenticadoReturn(token, data.user, uuid.v1())
 }
 
-module.exports.login = async event => {
-  
+const implementsLogin = async (event, repository)=>{
+
   const data = JSON.parse(event.body)
-  console.log('Usuário::' + data.user)
   let result
-  await authenticate(data)
+  await repository.authenticate(data)
           .then(res => res? result = getToken(data): result = respcod.naoAutenticadoReturn() )
           .catch(()=> result = respcod.naoAutenticadoReturn() )
   return result
 }
 
-module.exports.verificartk = async event => {
+const login = event => {
+
+  return implementsLogin(event, usuarioRepository)
+}
+
+const verificartk = async event => {
   
   const token  = event.headers.token
   if (!token) 
@@ -51,3 +55,9 @@ module.exports.verificartk = async event => {
   
   
 };
+
+module.exports = {
+  implementsLogin,
+  login,
+  verificartk
+}

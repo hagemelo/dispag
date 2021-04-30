@@ -1,4 +1,4 @@
-package br.com.jhage.dispag.efetivarnovodebito.exception;
+package br.com.jhage.dispag.core.exception;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -6,25 +6,25 @@ import org.apache.logging.log4j.Logger;
 /**
  * 
  * @author Alexsander Melo
- * @since 06/02/2021
+ * @since 05/02/2021
  *
  */
 
-public class LoadCredorException extends Exception {
+public class ConvertJsonToModelDataException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	private static final String DEFAULT= "ERRRO_ACAO_ABRUPTA";
 	
 	public Logger inicializarLogger() {
-		return LogManager.getLogger(LoadCredorException.class);
+		return LogManager.getLogger(ConvertJsonToModelDataException.class);
 	}
 
-	public LoadCredorException() {
+	public ConvertJsonToModelDataException() {
 		super(DEFAULT);
 		this.inicializarLogger().error(DEFAULT);
 	}
 	
-	public LoadCredorException(String message) {
+	public ConvertJsonToModelDataException(String message) {
 		super(message);
 		this.inicializarLogger().error(message);
 	}
@@ -38,5 +38,4 @@ public class LoadCredorException extends Exception {
 		}
 		return message;
 	}
-
 }

@@ -1,9 +1,5 @@
 package br.com.jhage.dispag.novodebito.service;
 
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,13 +10,11 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import br.com.jhage.dispag.core.constante.Mes;
 import br.com.jhage.dispag.core.modelo.Credor;
 import br.com.jhage.dispag.core.modelo.Debitos;
 import br.com.jhage.dispag.core.modelo.Orcamento;
-import br.com.jhage.dispag.novodebito.exception.ConvertJsonToNovoDebitoException;
+import br.com.jhage.dispag.core.service.DefaultService;
 import br.com.jhage.dispag.novodebito.exception.LoadCredorException;
 import br.com.jhage.dispag.novodebito.exception.LoadOrcamentoException;
 import br.com.jhage.dispag.novodebito.exception.NovoDebitoConsumerServiceListenException;
@@ -37,13 +31,9 @@ import br.com.jhage.dispag.novodebito.repository.OrcamentoRepository;
 
 @Service
 @Transactional
-public class NovoDebitoConsumerService implements CommandLineRunner{
+public class NovoDebitoConsumerService extends DefaultService<Debitos> implements CommandLineRunner{
 
 	private static final Logger logger = LogManager.getLogger(NovoDebitoConsumerService.class);
-	
-	private final CountDownLatch latch;
-	private String novodebito;
-	private Debitos debitos;
 	
 	@Autowired
 	private DebitosRepository debitosRepository;
@@ -57,21 +47,21 @@ public class NovoDebitoConsumerService implements CommandLineRunner{
 	
 	public NovoDebitoConsumerService(@Value("${kafka.number.receiver.threads}") Integer numberReceiverThreads) {
 		
-		latch = new CountDownLatch(numberReceiverThreads);
+		super(numberReceiverThreads, Debitos.class);
 	}
 	
 	@KafkaListener(id = "${kafka.group.id.condif}", topics = "${kafka.topic}")
     public void listen(ConsumerRecord<?, ?> debitoConsumerRecord) {
 		
+		
+		logger.info("Start Consumer Novodebito...");
 		try {
-			logger.info("Consumer value::" + debitoConsumerRecord.toString());
-			novodebito = new String((String) debitoConsumerRecord.value());
-			convertJsonToNovoDebito();
+			transformToBusinessData(debitoConsumerRecord);
 			loadCredor();
 			loadOrcamento();
-			debitosRepository.save(this.debitos);
-			logger.info("Debito Efetuado com SUCESSO!! ::" + this.debitos.converterToString());
-			
+			debitosRepository.save((Debitos)this.getModelo());
+			logger.info("Novo Debito Efetuado com <<SUCESSO>>!! ::" + this.getModelo().converterToString());
+			logger.info("End Consumer Novodebito...");
 		}catch (Exception e) {
 			StringBuffer buffer  = new StringBuffer()
 					.append("Erro ao receber valor::")
@@ -85,40 +75,18 @@ public class NovoDebitoConsumerService implements CommandLineRunner{
 	
 	private void loadCredor() throws LoadCredorException{
 		
-		Credor credor = credorRepository.loadCredorByDescricao(this.debitos.getCredor().getDescricao());
+		Credor credor = credorRepository.loadCredorByDescricao(((Debitos)this.getModelo()).getCredor().getDescricao());
 		assert credor != null : "Credor Não Encontrado";
-		this.debitos.add(credor);
+		((Debitos)this.getModelo()).add(credor);
 	}
 	
 	private void loadOrcamento() throws LoadOrcamentoException{
 		
-		int ano = this.debitos.getOrcamento().getAno();
-		Mes mes =  this.debitos.getOrcamento().getMes();
+		int ano = ((Debitos)this.getModelo()).getOrcamento().getAno();
+		Mes mes =  ((Debitos)this.getModelo()).getOrcamento().getMes();
 		Orcamento orc = orcamentoRepository.loadOrcamentoBy(ano, mes);
 		assert orc != null : "Orcamento Não Encontrado";
-		this.debitos.add(orc);
-	}
-	
-	private void convertJsonToNovoDebito() throws ConvertJsonToNovoDebitoException{
-		
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			
-			this.debitos = mapper.readValue(this.novodebito, Debitos.class);
-		} catch (IOException e) {
-			
-			throw new ConvertJsonToNovoDebitoException(e.getMessage());
-		}  
-	}
-	
-	public CountDownLatch getLatch() {
-		return latch;
-	}
-
-	@Override
-	public void run(String... args) throws Exception {
-		
-		latch.await(600, TimeUnit.SECONDS);
+		((Debitos)this.getModelo()).add(orc);
 	}
 	
 }

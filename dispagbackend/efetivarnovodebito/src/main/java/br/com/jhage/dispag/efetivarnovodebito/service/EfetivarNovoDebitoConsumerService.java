@@ -1,9 +1,5 @@
 package br.com.jhage.dispag.efetivarnovodebito.service;
 
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,10 +10,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import br.com.jhage.dispag.core.modelo.Debitos;
-import br.com.jhage.dispag.efetivarnovodebito.exception.ConvertJsonToNovoDebitoException;
+import br.com.jhage.dispag.core.service.DefaultService;
 import br.com.jhage.dispag.efetivarnovodebito.exception.LoadDebitosException;
 import br.com.jhage.dispag.efetivarnovodebito.repository.DebitosRepository;
 
@@ -30,14 +24,11 @@ import br.com.jhage.dispag.efetivarnovodebito.repository.DebitosRepository;
 
 @Service
 @Transactional
-public class EfetivarNovoDebitoConsumerService implements CommandLineRunner{
+public class EfetivarNovoDebitoConsumerService extends DefaultService<Debitos> implements CommandLineRunner{
 
 	private static final Logger logger = LogManager.getLogger(EfetivarNovoDebitoConsumerService.class);
 	
-	private final CountDownLatch latch;
 	
-	private ConsumerRecord<?, ?> debitoConsumerReceived;
-	private Debitos debitosKafkaReceived;
 	private Debitos debitoLoadedFromdb;
 	private final int sleepTime;
 	
@@ -49,18 +40,17 @@ public class EfetivarNovoDebitoConsumerService implements CommandLineRunner{
 	public EfetivarNovoDebitoConsumerService(@Value("${kafka.number.receiver.threads}") Integer numberReceiverThreads,
 			@Value("${set.sleep.time}") Integer sleepTime) {
 		
-		latch = new CountDownLatch(numberReceiverThreads);
+		super(numberReceiverThreads, Debitos.class);
 		this.sleepTime = sleepTime;
 	}
 	
 	@KafkaListener(id = "${kafka.group.id.condif}", topics = "${kafka.topic}")
     public void listen(ConsumerRecord<?, ?> consumerRecord){
 		
+		logger.info("Start Consumer Efetivar Novo Debito..." );
 		try {
-			logger.info("Consumer value::" + consumerRecord.toString());
 			Thread.sleep(sleepTime); //Pausa Importante para dar o devido tempo de processamento do NovoDebito
-			debitoConsumerReceived = consumerRecord;
-			convertJsonToNovoDebito();
+			transformToBusinessData(consumerRecord);
 			loadDebito();
 			this.debitoLoadedFromdb.aprovar();
 			debitosRepository.save(this.debitoLoadedFromdb);
@@ -73,34 +63,13 @@ public class EfetivarNovoDebitoConsumerService implements CommandLineRunner{
 					.append(" | Com Erro::")
 					.append(e.getMessage());
 			logger.error(buffer.toString());
-			latch.countDown();
 		}
     }
 	
 	private void loadDebito() throws LoadDebitosException{
 		
-		this.debitoLoadedFromdb = debitosRepository.loadCredorByDescricao(this.debitosKafkaReceived.getMarcacao(), this.debitosKafkaReceived.getVencimentoString()); 
-				
-		assert this.debitoLoadedFromdb  != null : "Orcamento Não Encontrado";
-	}
-	
-	private void convertJsonToNovoDebito() throws ConvertJsonToNovoDebitoException{
-		
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			
-			this.debitosKafkaReceived = mapper.readValue(new String((String) debitoConsumerReceived.value()), Debitos.class);
-		} catch (IOException e) {
-			
-			throw new ConvertJsonToNovoDebitoException(e.getMessage());
-		}  
-	}
-	
-	
-	@Override
-	public void run(String... args) throws Exception {
-		
-		latch.await(300, TimeUnit.DAYS);
+		this.debitoLoadedFromdb = debitosRepository.loadCredorByDescricao(((Debitos)this.getModelo()).getMarcacao(), ((Debitos)this.getModelo()).getVencimentoString()); 
+		assert this.debitoLoadedFromdb  != null : "Debito Não Encontrado";
 	}
 	
 }

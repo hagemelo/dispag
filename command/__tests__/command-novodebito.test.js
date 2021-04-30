@@ -1,10 +1,31 @@
-const config = require('../command/command')
+const {novoDebito} = require('../command/novodebito_handler')
+const mockedEnv = require('mocked-env')
 
-test('adds 1 + 2 to equal 3', async () => {
-    expect(1+ 2).toBe(3)
+let restore = mockedEnv({
+   
+    KAFKA_ENABLE : 'OFF'
+
 })
 
 
-test('adds 1 + 2 to equal 3', async () => {
-    expect(1+ 2).toBe(3)
+test('Teste de autenticacao OK, expera retorno 200', async () => {
+
+
+    const PAYLOAD_AUTH = '{"valor":2, "marcacao":"PAGAMENTO DE BESTEIRA", '+
+        '"credor":{ "descricao":"DINHEIRO NA CARTEIRA", "tipo":"AVULSOS" }, '+
+        '"orcamento":{"mes":"ABRIL", "ano":"2021"}, ' +
+        '"vencimento":"08/12/2021" }'
+    const vbody = JSON.stringify(PAYLOAD_AUTH)
+    const command = {
+        execCommand : async function (params){
+    
+                return true
+        }
+    }
+    const event = {
+        body : vbody
+    }
+
+    const result = await novoDebito(event, command.execCommand)
+    //expect(result.statusCode).toBe(200)
 })

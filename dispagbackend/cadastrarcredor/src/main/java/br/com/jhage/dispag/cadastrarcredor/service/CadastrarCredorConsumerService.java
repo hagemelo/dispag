@@ -1,9 +1,5 @@
 package br.com.jhage.dispag.cadastrarcredor.service;
 
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,13 +10,11 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import br.com.jhage.dispag.cadastrarcredor.exception.CadastrarCredorConsumerServiceListenException;
-import br.com.jhage.dispag.cadastrarcredor.exception.ConvertJsonToCadastrarCredorException;
 import br.com.jhage.dispag.cadastrarcredor.exception.LoadCredorException;
 import br.com.jhage.dispag.cadastrarcredor.repository.CredorRepository;
 import br.com.jhage.dispag.core.modelo.Credor;
+import br.com.jhage.dispag.core.service.DefaultService;
 
 /**
  * 
@@ -31,14 +25,9 @@ import br.com.jhage.dispag.core.modelo.Credor;
 
 @Service
 @Transactional
-public class CadastrarCredorConsumerService implements CommandLineRunner{
+public class CadastrarCredorConsumerService extends DefaultService<Credor> implements CommandLineRunner{
 
 	private static final Logger logger = LogManager.getLogger(CadastrarCredorConsumerService.class);
-	
-	private final CountDownLatch latch;
-	private String cadastrarcredor;
-	private Credor credor,novoCredor;
-	
 	
 	@Autowired
 	private CredorRepository credorRepository;
@@ -46,20 +35,20 @@ public class CadastrarCredorConsumerService implements CommandLineRunner{
 	
 	public CadastrarCredorConsumerService(@Value("${kafka.number.receiver.threads}") Integer numberReceiverThreads) {
 		
-		latch = new CountDownLatch(numberReceiverThreads);
+		super(numberReceiverThreads, Credor.class);
 	}
 	
 	@KafkaListener(id = "${kafka.group.id.condif}", topics = "${kafka.topic}")
     public void listen(ConsumerRecord<?, ?> credorConsumerRecord) {
 		
+		logger.info("Start Consumer Credor ..." );
 		try {
-			logger.info("Consumer value::" + credorConsumerRecord.toString());
-			cadastrarcredor = new String((String) credorConsumerRecord.value());
-			convertJsonToCadastrarCredor();
-			loadCredor();
-			if (this.credor == null) {
-				credorRepository.save(new Credor(this.novoCredor.getDescricao(), this.novoCredor.getTipo()));
-				logger.info("Credor Efetuado com SUCESSO!! ::" + this.novoCredor.converterToString());
+			
+			transformToBusinessData(credorConsumerRecord);
+			if (credorNaoCadastrado()) {
+				
+				creatCredor();
+				logger.info("Credor Efetuado com SUCESSO!! ::" + ((Credor)this.getModelo()).converterToString());
 			}
 		}catch (Exception e) {
 			StringBuffer buffer  = new StringBuffer()
@@ -71,32 +60,17 @@ public class CadastrarCredorConsumerService implements CommandLineRunner{
 			throw new CadastrarCredorConsumerServiceListenException();
 		}
     }
-	
-	private void loadCredor() throws LoadCredorException{
-		
-		this.credor = credorRepository.loadCredorByDescricao(this.novoCredor.getDescricao());
-	}
-	
-	private void convertJsonToCadastrarCredor() throws ConvertJsonToCadastrarCredorException{
-		
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			
-			this.novoCredor = mapper.readValue(this.cadastrarcredor, Credor.class);
-		} catch (IOException e) {
-			
-			throw new ConvertJsonToCadastrarCredorException(e.getMessage());
-		}  
-	}
-	
-	public CountDownLatch getLatch() {
-		return latch;
-	}
 
-	@Override
-	public void run(String... args) throws Exception {
+	private void creatCredor() throws Exception{
 		
-		latch.await(600, TimeUnit.SECONDS);
+		Credor novoCredor = new Credor(((Credor)this.getModelo()).getDescricao(), ((Credor)this.getModelo()).getTipo());
+		novoCredor.aprovar();
+		credorRepository.save(novoCredor);
+	}
+	
+	private boolean credorNaoCadastrado() throws LoadCredorException{
+		
+		return credorRepository.loadCredorByDescricao(((Credor)this.getModelo()).getDescricao()) ==null;
 	}
 	
 }

@@ -10,18 +10,15 @@ const getToken = data =>{
   const token =  jwt.sign({ id: data.user, senha: data.passwd }, process.env.SECRET, {
     expiresIn: 86400 // validade do token, 24hrs
    })
-
   return respcod.autenticadoReturn(token, data.user, uuid.v1())
 }
 
 const implementsLogin = async (event, repository)=>{
 
   const data = JSON.parse(event.body)
-  let result
-  await repository.authenticate(data)
-          .then(res => res? result = getToken(data): result = respcod.naoAutenticadoReturn() )
-          .catch(()=> result = respcod.naoAutenticadoReturn() )
-  return result
+  return repository.authenticate(data)
+          .then(res => {return res?  getToken(data): respcod.naoAutenticadoReturn()})
+          .catch(()=> {return respcod.naoAutenticadoReturn()})
 }
 
 const login = event => {

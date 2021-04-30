@@ -1,6 +1,7 @@
 //'use strict';
 const kafka = require('kafka-node')
 const command = require('./command')
+const verify = require('../auth/verify_token')
 const {responseCode: respcod}  = require('../conf/response-code')
 const {AusenciaHeadersFundamentaisError: AusenciaHeadersFundamentaisError} = require('../exceptions/exception')
 const {TokenExpiradoError: TokenExpiradoError} = require('../exceptions/exception')
@@ -29,12 +30,12 @@ const pushCadastrarCredor = async event=> {
 const commandNovoDebito = async event =>{
   
   try{
-    command.validarTokenExpirado(event)
-    command.existHeadertkuuid(event)
+    
+    verify.validarTokenExpirado(event)
+    verify.existHeadertkuuid(event)
     await pushCadastrarCredor(event) 
     await pushNovodebito(event)
     await pushEfetivarNovodebito(event) 
-    
     return respcod.acceptedWithThismessageReturn(event, 'Operacao Realizada Com Sucesso, as acoes serão tomadas no decorrer do tempo')  
   }catch (exception) {
     if (exception instanceof TokenExpiradoError) {
@@ -53,13 +54,19 @@ const commandNovoDebito = async event =>{
     
 }
 
-module.exports.action = async event =>{
+const novoDebito = async (event, execCommand) =>{
 
-  let result 
-  await command.isKafkaOn()
-              .then(() => result = commandNovoDebito(event))
-              .catch(error=> result = respcod.acceptedWithThismessageReturn(event, error.message))
-      
-  return result   
+  return command.isKafkaOn()
+              .then(() => {return execCommand(event)})
+              .catch(error=> {return respcod.acceptedWithThismessageReturn(event, error.message)})
 }
 
+const action = async event =>{
+     
+  return novoDebito(event, commandNovoDebito)   
+}
+
+module.exports = {
+  action,
+  novoDebito
+}

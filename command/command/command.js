@@ -4,8 +4,7 @@ const kafka = require('kafka-node')
 const client = new kafka.KafkaClient({kafkaHost: process.env.KAFKA_SERVER})
 const jwt = require('jsonwebtoken')
 //# Class Exxeptions
-const {TokenExpiradoError: TokenExpiradoError} = require('../exceptions/exception')
-const {AusenciaHeadersFundamentaisError: AusenciaHeadersFundamentaisError} = require('../exceptions/exception')
+
 const {PushTopicError} = require('../exceptions/exception')
 
 
@@ -13,24 +12,6 @@ const isKafkaOn = async ()=>{
   
   if (process.env.KAFKA_ENABLE == 'OFF')
     throw new Error('[Kafka Off] Nenhuma Acao Sera Tomada')
-}
-
-const validarTokenExpirado = event =>{
-  
-  jwt.verify(event.headers.token, process.env.SECRET, function(err, decoded) {      
-    if (err) 
-      throw new TokenExpiradoError("Token Expirado")  
-  });
-
-  console.log("Token::" + event.headers.token)
-}
-
-const existHeadertkuuid = event =>{
-  
-  if(!event.headers.token && !event.headers.uuid) 
-    throw new AusenciaHeadersFundamentaisError("Ausencia dos headers uuid e token")
-  
-  console.log("uuid::" + event.headers.uuid)
 }
 
 const createmsgtopushKafka = (topic, body)=>{
@@ -66,4 +47,4 @@ const pushTopic = payloads =>{
 
 
 
-module.exports = { isKafkaOn, validarTokenExpirado, existHeadertkuuid, createmsgtopushKafka, pushTopic }
+module.exports = { isKafkaOn, createmsgtopushKafka, pushTopic }

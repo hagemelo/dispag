@@ -20,7 +20,7 @@ O objetivo é apenas reunir conhecimento de tecnologias.
 
 
 ### Arquitetura Lógica
-![N|Solid](https://github.com/hagemelo/microsservico/blob/master/dispag/arq-logica.JPG)
+![N|Solid](https://github.com/hagemelo/microsservico/blob/master/dispag/Arquiteturalogica.JPG)
 
 
 

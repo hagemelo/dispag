@@ -20,4 +20,10 @@ const existHeadertkuuid = event =>{
     console.log("uuid::" + event.headers.uuid)
 }
 
-module.exports = { validarTokenExpirado, existHeadertkuuid}
+const execVerify = event => {
+
+  validarTokenExpirado(event)
+  existHeadertkuuid(event)
+}
+
+module.exports = { validarTokenExpirado, existHeadertkuuid, execVerify}

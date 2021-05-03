@@ -71,12 +71,43 @@ functions:
   #==> COMMAND
   command-novodebito:
         name: command-novodebito-lb
-        handler: command/novodebito-handler.action
+        handler: command/novodebito-handler.novodebito
         events:
             - http:
                 method: post
-                path: novodebito
+                path: command/novodebito
 
+  command-pagardebito:
+        name: command-pagardebito-lb
+        handler: command/pagardebito-handler.pagardebito
+        events:
+            - http:
+                method: post
+                path: command/pagardebito
+
+  command-excluirdebito:
+        name: command-excluirdebito-lb
+        handler: command/excluirdebito-handler.excluirdebito
+        events:
+            - http:
+                method: delete
+                path: command/excluirdebito
+
+  command-novoorcamento:
+        name: command-novoorcamento-lb
+        handler: command/novoorcamento-handler.novoorcamento
+        events:
+            - http:
+                method: post
+                path: command/novoorcamento
+
+  command-excluirorcamento:
+        name: command-excluirorcamento-lb
+        handler: command/excluirorcamento-handler.excluirorcamento
+        events:
+            - http:
+                method: delete
+                path: command/excluirorcamento
   #==> AUTH
   auth:
         name: auth-lb
@@ -84,7 +115,7 @@ functions:
         events:
             - http:
                 method: post
-                path: login
+                path: auth/login
 
   #==> QUERY
   query-saldos-debitos-no-mes:
@@ -93,14 +124,15 @@ functions:
         events:
             - http:
                 method: post
-                path: saldos/debitos/no/mes
+                path: query/saldos/debitos/no/mes
+
   query-detalhes-debitos-no-mes:
         name: detahesdebitosnomes-lb
         handler: query/debitos-handler.datelhes
         events:
             - http:
                 method: post
-                path: datelhes/debitos/no/mes
+                path: query/datelhes/debitos/no/mes
 
   query-orcamento-no-mes:
         name: orcamentoanomes-lb
@@ -108,7 +140,7 @@ functions:
         events:
             - http:
                 method: post
-                path: orcamento/no/mes  
+                path: query/orcamento/no/mes  
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

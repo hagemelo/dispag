@@ -1,7 +1,7 @@
 'use strict';
 var jwt = require('jsonwebtoken') // package jwt 
 const uuid = require ("uuid");
-const usuarioRepository = require('../repository/usuarioRepository')
+const usuarioRepository = require('../repository/usuario-repository')
 const {responseCode: respcod}  = require('../conf/response-code')
 
 

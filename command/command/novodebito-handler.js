@@ -1,8 +1,7 @@
 //'use strict';
-const kafka = require('kafka-node')
 const command = require('./command')
-const verify = require('../auth/verify_token')
-const {responseCode: respcod}  = require('../conf/response-code')
+const verify = require('../auth/verify-token')
+const {responseCode: respcod}  = require('../conf/response_code')
 const {AusenciaHeadersFundamentaisError: AusenciaHeadersFundamentaisError} = require('../exceptions/exception')
 const {TokenExpiradoError: TokenExpiradoError} = require('../exceptions/exception')
 const {PushTopicError: PushTopicError} = require('../exceptions/exception')

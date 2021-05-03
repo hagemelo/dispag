@@ -68,20 +68,47 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
+  #==> COMMAND
   command-novodebito:
         name: command-novodebito-lb
-        handler: command/novodebito_handler.action
+        handler: command/novodebito-handler.action
         events:
             - http:
                 method: post
                 path: novodebito
+
+  #==> AUTH
   auth:
         name: auth-lb
-        handler: auth/handler.login
+        handler: auth/auth-handler.login
         events:
             - http:
                 method: post
                 path: login
+
+  #==> QUERY
+  query-saldos-debitos-no-mes:
+        name: saldosdebitosnomes-lb
+        handler: query/debitos-handler.saldosmes
+        events:
+            - http:
+                method: post
+                path: saldos/debitos/no/mes
+  query-detalhes-debitos-no-mes:
+        name: detahesdebitosnomes-lb
+        handler: query/debitos-handler.datelhes
+        events:
+            - http:
+                method: post
+                path: datelhes/debitos/no/mes
+
+  query-orcamento-no-mes:
+        name: orcamentoanomes-lb
+        handler: query/orcamento-handler.orcamentoanomes
+        events:
+            - http:
+                method: post
+                path: orcamento/no/mes  
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

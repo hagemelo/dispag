@@ -24,7 +24,7 @@ import br.com.jhage.dispag.excluirdebito.repository.DebitosRepository;
 
 //@SpringBootTest(classes = NovoDebitoApplication.class)
 //@DirtiesContext
-//@Ignore
+@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest()
 @ActiveProfiles("test")

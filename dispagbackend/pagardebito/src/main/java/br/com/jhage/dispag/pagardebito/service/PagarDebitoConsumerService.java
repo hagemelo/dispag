@@ -1,9 +1,5 @@
 package br.com.jhage.dispag.pagardebito.service;
 
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,10 +10,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import br.com.jhage.dispag.core.modelo.Debitos;
-import br.com.jhage.dispag.pagardebito.exception.ConvertJsonToDebitoException;
+import br.com.jhage.dispag.core.service.DefaultService;
 import br.com.jhage.dispag.pagardebito.repository.DebitosRepository;
 
 /**
@@ -29,33 +23,31 @@ import br.com.jhage.dispag.pagardebito.repository.DebitosRepository;
 
 @Service
 @Transactional
-public class PagarDebitoConsumerService implements CommandLineRunner{
+public class PagarDebitoConsumerService extends DefaultService<Debitos> implements CommandLineRunner{
 
 	private static final Logger logger = LogManager.getLogger(PagarDebitoConsumerService.class);
-	
-	private final CountDownLatch latch;
-	private String debito;
-	private Debitos debitos;
+
+	private Debitos debitoLoadedFromdb;
 	
 	@Autowired
 	private DebitosRepository debitosRepository;
 	
 	public PagarDebitoConsumerService(@Value("${kafka.number.receiver.threads}") Integer numberReceiverThreads) {
 		
-		latch = new CountDownLatch(numberReceiverThreads);
+		super(numberReceiverThreads, Debitos.class);
 	}
 	
 	@KafkaListener(id = "${kafka.group.id.condif}", topics = "${kafka.topic}")
     public void listen(ConsumerRecord<?, ?> debitoConsumerRecord){
 		
+		logger.info("Start Consumer Pagar Debito..." );
 		try {
-			logger.info("Consumer value::" + debitoConsumerRecord.toString());
-			debito = new String((String) debitoConsumerRecord.value());
-			convertJsonToDebito();
+			
+			transformToBusinessData(debitoConsumerRecord);
 			loadDebito();
-			this.debitos.pagar();
-			debitosRepository.save(this.debitos);
-			logger.info("Debito Pago com SUCESSO!! ::" + this.debitos.converterToString());
+			this.debitoLoadedFromdb.pagar();
+			debitosRepository.save(this.debitoLoadedFromdb);
+			logger.info("Debito Pago com SUCESSO!! ::" + this.debitoLoadedFromdb.converterToString());
 		}catch (Exception e) {
 			e.printStackTrace();
 			StringBuffer buffer  = new StringBuffer()
@@ -64,32 +56,14 @@ public class PagarDebitoConsumerService implements CommandLineRunner{
 					.append(" | Com Erro::")
 					.append(e.getMessage());
 			logger.error(buffer.toString());
-			latch.countDown();
 		}
     }
 	
 	private void loadDebito() {
 		
-		this.debitos = debitosRepository.getOne(this.debitos.getId());
+		this.debitoLoadedFromdb = debitosRepository.loadCredorByDescricao(((Debitos)this.getModelo()).getMarcacao(), ((Debitos)this.getModelo()).getVencimentoString()); 
+		assert this.debitoLoadedFromdb  != null : "Debito Não Encontrado";
 	}
-	
-	private void convertJsonToDebito() throws ConvertJsonToDebitoException{
-		
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			
-			this.debitos = mapper.readValue(this.debito, Debitos.class);
-		} catch (IOException e) {
-			
-			throw new ConvertJsonToDebitoException(e.getMessage());
-		}  
-	}
-	
-	
-	@Override
-	public void run(String... args) throws Exception {
-		
-		latch.await(300, TimeUnit.DAYS);
-	}
+
 	
 }

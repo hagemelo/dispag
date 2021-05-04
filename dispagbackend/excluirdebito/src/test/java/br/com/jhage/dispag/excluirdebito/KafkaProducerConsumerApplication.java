@@ -1,10 +1,12 @@
 package br.com.jhage.dispag.excluirdebito;
 
+import org.junit.Ignore;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
+@Ignore
 @SpringBootApplication
 @EnableAutoConfiguration
 @EntityScan( basePackages = {"br.com.jhage.dispag.core.modelo", "br.com.jhage.dispag.novodebito.repository"} )

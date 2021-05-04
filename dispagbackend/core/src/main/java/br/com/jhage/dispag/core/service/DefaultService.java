@@ -62,6 +62,6 @@ public abstract class DefaultService<T> {
 	
 	public void run(String... args) throws Exception {
 		
-		latch.await(600, TimeUnit.SECONDS);
+		latch.await(600, TimeUnit.DAYS);
 	}
 }

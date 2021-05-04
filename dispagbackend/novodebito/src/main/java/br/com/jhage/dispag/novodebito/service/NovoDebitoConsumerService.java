@@ -17,7 +17,6 @@ import br.com.jhage.dispag.core.modelo.Orcamento;
 import br.com.jhage.dispag.core.service.DefaultService;
 import br.com.jhage.dispag.novodebito.exception.LoadCredorException;
 import br.com.jhage.dispag.novodebito.exception.LoadOrcamentoException;
-import br.com.jhage.dispag.novodebito.exception.NovoDebitoConsumerServiceListenException;
 import br.com.jhage.dispag.novodebito.repository.CredorRepository;
 import br.com.jhage.dispag.novodebito.repository.DebitosRepository;
 import br.com.jhage.dispag.novodebito.repository.OrcamentoRepository;
@@ -69,7 +68,6 @@ public class NovoDebitoConsumerService extends DefaultService<Debitos> implement
 					.append(" | Com Erro::")
 					.append(e.getMessage());
 			logger.error(buffer.toString());
-			throw new NovoDebitoConsumerServiceListenException();
 		}
     }
 	

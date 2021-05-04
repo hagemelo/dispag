@@ -1,10 +1,12 @@
 package br.com.jhage.dispag.core;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import br.com.jhage.dispag.core.constante.Mes;
 
+@Ignore
 public class MesTest {
 	
 	

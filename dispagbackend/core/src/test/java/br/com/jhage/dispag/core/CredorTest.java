@@ -20,12 +20,15 @@ public class CredorTest {
 		Orcamento orc = new Orcamento();
 		Debitos deb = new Debitos().add(cred).add(orc); 
 		System.out.println(deb.getJsonValue());
+		System.out.println(orc.getJsonValue());
 		
 		int UM  = 1;
 		
 		String variavelDeAmbiente = System.getenv("KAFKA_SERVER");
 		System.out.println("Variavel:::" + variavelDeAmbiente);
 		Assert.assertEquals(UM, 1);
+		
+		
 		
 	}
 

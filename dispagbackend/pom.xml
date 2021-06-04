@@ -29,9 +29,9 @@
 		<module>efetivarnovodebito</module>
 		<module>excluirdebito</module>
 		<module>cadastrarcredor</module>
-		<!--<module>command</module>
+		<module>novoorcamento</module>
 		
-		<module>agendaratendimento</module>
+		<!--<module>agendaratendimento</module>
 		<module>cadastrarcliente</module>-->
 	</modules>
 	

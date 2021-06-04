@@ -149,6 +149,11 @@ public class Orcamento implements JhageEntidade<Orcamento> {
 		return this.basicos + this.avulsos + this.recorrentes;
 	}
 
+	public String getUsuarioString() {
+		
+		return this.usuario.getNome()==null? this.usuario.getLogin(): this.usuario.getNome();
+	}
+	
 	public Orcamento add(Usuario usuario) {
 		
 		this.usuario = usuario;

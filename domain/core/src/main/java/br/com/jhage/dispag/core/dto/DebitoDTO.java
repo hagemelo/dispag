@@ -41,7 +41,7 @@ public class DebitoDTO {
 	private Date vencimento;
 
 	public DebitoDTO(Double valor, Status status, Estado estado, String marcacao, CredorDTO credor,
-			OrcamentoDTO orcamento) {
+			OrcamentoDTO orcamento, Date vencimento) {
 
 		this.valor = valor;
 		this.status = status;
@@ -49,7 +49,10 @@ public class DebitoDTO {
 		this.marcacao = marcacao;
 		this.credor = credor;
 		this.orcamento = orcamento;
+		this.vencimento = vencimento;
 	}
+	
+	public DebitoDTO() {}
 
 	public Double getValor() {
 

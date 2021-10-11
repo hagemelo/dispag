@@ -1,8 +1,10 @@
-package br.com.jhage.dispag.core.modelo;
+package br.com.jhage.dispag.debito.modelo;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,8 +12,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -20,28 +20,29 @@ import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.jhage.dispag.core.constante.Estado;
 import br.com.jhage.dispag.core.constante.Status;
+import br.com.jhage.dispag.core.dto.DebitoDTO;
 import br.com.jhage.dispag.core.exception.ConverterToStringException;
 import br.com.jhage.dispag.core.exception.FormatDateHelperException;
 import br.com.jhage.dispag.core.exception.NumberHelpException;
 import br.com.jhage.dispag.core.helper.FormatDateHelper;
 import br.com.jhage.dispag.core.helper.NumberHelp;
+import br.com.jhage.dispag.core.modelo.JhageEntidade;
 
 /**
  * 
  * @author Alexsander Melo
- * @since 04/02/2021
+ * @since 09/09/2021
  * 
  * 
  */
 @Entity
-@Table(name = "TB_DEBITOS")
-public class Debitos implements JhageEntidade<Debitos> {
+@Table(name = "DISPAG_DEBITOS")
+public class Debito implements JhageEntidade<Debito> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -60,7 +61,7 @@ public class Debitos implements JhageEntidade<Debitos> {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status")
 	private Status status;
-	
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "estado")
 	private Estado estado;
@@ -68,101 +69,38 @@ public class Debitos implements JhageEntidade<Debitos> {
 	@Column(name = "MARCACAO")
 	private String marcacao;
 
-	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
-	@JoinColumn(name = "CREDOR_ID", referencedColumnName = "CREDOR_ID")
-	private Credor credor;
-	
-	
-	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST })
-	@JoinColumn(name = "ORC_ID", referencedColumnName = "ORC_ID")
-	private Orcamento orcamento;
+	@Column(name = "Credor")
+	private String credor;
+
+	@Column(name = "Orcamento")
+	private String orcamento;
 
 	@JsonFormat(pattern = "dd/MM/yyyy", timezone = "Brazil/East")
 	@Temporal(TemporalType.DATE)
 	private Date vencimento;
 
-	public Debitos() {
+	public Debito(DebitoDTO debitoDTO) {
 
-		this.valor = Double.valueOf(ZERO);
-		this.vencimento = new Date();
+		this.valor = debitoDTO.getValor();
+		this.vencimento = debitoDTO.getVencimento();
 		this.status = Status.AVENCER;
 		this.estado = Estado.PENDENTE;
 	}
 
-	public Debitos(Double valor, String status, String vencimento) {
-
-		this.valor = 0.;
-		this.vencimento = new Date();
-		this.status = Status.AVENCER;
-		this.estado = Estado.PENDENTE;
-	}
-
-	@Override
 	public Long getId() {
 
 		return this.id;
 	}
 
-	public Double getValor() {
-		return valor;
-	}
-
-	public Status getStatus() {
-		return status;
-	}
-
-	public Credor getCredor() {
-		return credor;
-	}
-
-	public Date getVencimento() {
-		return vencimento;
-	}
-	
 	@JsonIgnore
 	public String getVencimentoString() {
 		try {
-			return  FormatDateHelper.getInstance().converterDataParaCaracter(this.vencimento);
+			return FormatDateHelper.getInstance().converterDataParaCaracter(this.vencimento);
 		} catch (FormatDateHelperException e) {
 
 			e.printStackTrace();
 			return "";
 		}
-	}
-
-	public Estado getEstado() {
-		return estado;
-	}
-	
-	public Orcamento getOrcamento() {
-		return orcamento;
-	}
-
-	public Debitos add(Credor credor) {
-
-		this.credor = credor;
-		return this;
-	}
-	
-	public Debitos add(Orcamento orcamento) {
-
-		this.orcamento = orcamento;
-		return this;
-	}
-
-	public String getCredorString() {
-		
-		return this.getCredor().getDescricao();
-	}
-	
-	public String getMarcacao() {
-		return marcacao;
-	}
-
-	@JsonProperty
-	public String valorString() throws NumberHelpException {
-
-		return NumberHelp.parseDoubleToString(this.getValor());
 	}
 
 	@JsonIgnore
@@ -181,25 +119,31 @@ public class Debitos implements JhageEntidade<Debitos> {
 
 		this.status = Status.ATRASADO;
 	}
-	
+
 	public void aprovar() {
-		
+
 		this.estado = Estado.APROVADO;
 	}
-	
+
 	public void rejeitar() {
-		
+
 		this.estado = Estado.REJEITADO;
 	}
 	
+	public Boolean isPendente() {
+		
+		Boolean result = false;
+		result |=  Estado.PENDENTE.equals(this.estado);
+		return result;
+	}
+
 	@Override
 	public String converterToString() throws ConverterToStringException {
 		String result = "";
 		try {
-			StringBuffer buffer = new StringBuffer().append(this.credor.converterToString()).append(SEPARADOR)
-					.append(this.marcacao).append(SEPARADOR)
-					.append(FormatDateHelper.getInstance().converterDataParaCaracter(this.vencimento)).append(SEPARADOR)
-					.append(NumberHelp.parseDoubleToString(this.valor));
+			StringBuffer buffer = new StringBuffer().append(this.credor).append(SEPARADOR).append(this.marcacao)
+					.append(SEPARADOR).append(FormatDateHelper.getInstance().converterDataParaCaracter(this.vencimento))
+					.append(SEPARADOR).append(NumberHelp.parseDoubleToString(this.valor));
 			result = buffer.toString();
 		} catch (NumberHelpException | FormatDateHelperException e) {
 			e.printStackTrace();
@@ -208,8 +152,29 @@ public class Debitos implements JhageEntidade<Debitos> {
 		return result;
 	}
 
+	public boolean isValid() {
+
+		return this.valor != null && this.marcacao != null && this.marcacao.length() != 0 && this.credor != null
+				&& this.orcamento != null && this.vencimento != null;
+	}
+
 	@Override
 	public int hashCode() {
+
+		try {
+			
+			MessageDigest m = MessageDigest.getInstance("MD5");
+			m.update(String.valueOf(gerarPrimeValue()).getBytes(), 0, String.valueOf(gerarPrimeValue()).length());
+			return new BigInteger(1, m.digest()).intValue();
+			
+		} catch (NoSuchAlgorithmException e) {
+
+			e.printStackTrace();
+			return 1;
+		}
+	}
+
+	private int gerarPrimeValue() {
 
 		final int prime = 31;
 		int result = 1;
@@ -225,10 +190,10 @@ public class Debitos implements JhageEntidade<Debitos> {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof Debitos)) {
+		if (!(obj instanceof Debito)) {
 			return false;
 		}
-		Debitos other = (Debitos) obj;
+		Debito other = (Debito) obj;
 		return super.equals(obj) && this.id.equals(other.id) && this.valor.equals(other.valor);
 	}
 }

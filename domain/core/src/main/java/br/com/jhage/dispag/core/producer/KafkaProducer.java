@@ -6,6 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+
+/**
+ * 
+ * @author Alexsander Melo
+ * @since 10/10/2021
+ *
+ */
 @Component
 public class KafkaProducer implements Pusher{
 
@@ -16,12 +23,12 @@ public class KafkaProducer implements Pusher{
 	
 	
 	@Override
-	public void push(String topic, String payload) {
+	public Boolean push(String topic, String payload) {
 
 		LOGGER.info("==> Push topic='{}' sending payload='{}' to ", topic, payload);
         kafkaTemplate.send(topic, payload);
+        LOGGER.info("==> Push Finalizado. ");
+        return true;
 	}
-
-        
 
 }

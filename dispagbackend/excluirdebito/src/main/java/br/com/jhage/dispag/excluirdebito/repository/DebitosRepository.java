@@ -37,11 +37,11 @@ public class DebitosRepository {
 												   "and d.estado = br.com.jhage.dispag.core.constante.Estado.PENDENTE "+
 												   "and to_char(d.vencimento, 'dd/MM/yyyy') like :vencimento";
 
-	public Debitos loadCredorByDescricao(String marcacao, String vencimento) {
+	public Debitos loadCredorByDescricao(Debitos paramDeb) {
 				
 		return (Debitos) entityManager.createQuery(QUERYLOADDEBITOS, Debitos.class)
-				.setParameter("marcacao", marcacao)
-				.setParameter("vencimento", vencimento)
+				.setParameter("marcacao", paramDeb.getMarcacao())
+				.setParameter("vencimento", paramDeb.getVencimentoString())
 				.setMaxResults(LIMIT).getSingleResult();
 	}
 	

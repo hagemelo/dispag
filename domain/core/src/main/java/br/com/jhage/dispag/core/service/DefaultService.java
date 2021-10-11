@@ -5,10 +5,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import br.com.jhage.dispag.core.exception.ConvertJsonToModelDataException;
 
 /**
  * 
@@ -17,37 +17,48 @@ import br.com.jhage.dispag.core.exception.ConvertJsonToModelDataException;
  *
  */
 
-public abstract class DefaultService<T> {
+public abstract class DefaultService<D,E> {
 	
 	private final CountDownLatch latch;
-	private T modelo;
+	private D dtoObject;
+	private E modelObject;
 	private String received;
-	private final Class<T> modeloClass;
+	private final Class<D> modeloClass;
 	
+	private static final Logger logger = LogManager.getLogger(DefaultService.class);
 	
-	public DefaultService(Integer numberReceiverThreads, Class<T> modeloClass) {
+	public DefaultService(Integer numberReceiverThreads, Class<D> modeloClass) {
 	
 		latch = new CountDownLatch(numberReceiverThreads);
 		this.modeloClass = modeloClass;
 	}
 	
-	public void transformToBusinessData(ConsumerRecord<?, ?> consumerRecord) throws ConvertJsonToModelDataException {
+	public Boolean transformToDTO(ConsumerRecord<?, ?> consumerRecord) {
 		
 		this.received = new String((String) consumerRecord.value());
-		convertJsonToModelData();
+		return convertJsonToDTO();
 	}
-	
-	
-	public void convertJsonToModelData() throws ConvertJsonToModelDataException{
+
+	public Boolean convertJsonToDTO(){
 		
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			
-			this.modelo = (T) mapper.readValue(this.received, modeloClass);
+			this.dtoObject = (D) mapper.readValue(this.received, modeloClass);
+			return true;
 		} catch (IOException e) {
 			
-			throw new ConvertJsonToModelDataException(e.getMessage());
+			logger.error(e.getMessage());
+			return false;
 		}  
+	}
+	
+	public abstract void createModelFromDtoObject();
+	
+	
+	public String getRecordReceived() {
+		
+		return this.received;
 	}
 	
 	public CountDownLatch getLatch() {
@@ -55,10 +66,19 @@ public abstract class DefaultService<T> {
 	}
 	
 	
-	public T getModelo() {
-		return modelo;
+	public D getDtoObject() {
+		return dtoObject;
 	}
 
+	public E getModel() {
+		
+		return this.modelObject;
+	}
+	
+	public void setModel(E e) {
+		
+		this.modelObject = e;
+	}
 	
 	public void run(String... args) throws Exception {
 		

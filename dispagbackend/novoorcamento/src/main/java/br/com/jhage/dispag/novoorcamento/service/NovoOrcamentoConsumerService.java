@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.jhage.dispag.core.modelo.Orcamento;
 import br.com.jhage.dispag.core.modelo.Usuario;
 import br.com.jhage.dispag.core.service.DefaultService;
+import br.com.jhage.dispag.novoorcamento.exception.LoadOrcamentoException;
 import br.com.jhage.dispag.novoorcamento.exception.LoadUsuarioException;
 import br.com.jhage.dispag.novoorcamento.repository.OrcamentoRepository;
 import br.com.jhage.dispag.novoorcamento.repository.UsuarioRepository;
@@ -49,8 +50,9 @@ public class NovoOrcamentoConsumerService extends DefaultService<Orcamento> impl
 
 			transformToBusinessData(orcamentoConsumerRecord);
 			loadUsuario();
-			orcamentoRepository.save((Orcamento)this.getModelo());
-			
+			if (orcamentoNaoCadastrado()) {
+				orcamentoRepository.save((Orcamento)this.getModelo());
+			}
 			logger.info("Novo Orcamento Efetuado com <<SUCESSO>>!! ::" + this.getModelo().converterToString());
 			logger.info("End Consumer Novoorcamento...");
 		}catch (Exception e) {
@@ -68,6 +70,11 @@ public class NovoOrcamentoConsumerService extends DefaultService<Orcamento> impl
 		Usuario usuario = usuarioRepository.loadUsuarioBy(((Orcamento)this.getModelo()).getUsuarioString()); 
 		assert usuario != null : "Usuario Não Encontrado";
 		((Orcamento)this.getModelo()).add(usuario);
+	}
+	
+	private boolean orcamentoNaoCadastrado() throws LoadOrcamentoException{
+		
+		return orcamentoRepository.loadOrcamentoBy(((Orcamento)this.getModelo()).getAno(), ((Orcamento)this.getModelo()).getMes()) ==null;
 	}
 	
 }

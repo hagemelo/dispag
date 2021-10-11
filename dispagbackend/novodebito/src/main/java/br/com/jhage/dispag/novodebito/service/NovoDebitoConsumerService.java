@@ -10,7 +10,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.jhage.dispag.core.constante.Mes;
 import br.com.jhage.dispag.core.modelo.Credor;
 import br.com.jhage.dispag.core.modelo.Debitos;
 import br.com.jhage.dispag.core.modelo.Orcamento;
@@ -73,16 +72,14 @@ public class NovoDebitoConsumerService extends DefaultService<Debitos> implement
 	
 	private void loadCredor() throws LoadCredorException{
 		
-		Credor credor = credorRepository.loadCredorByDescricao(((Debitos)this.getModelo()).getCredor().getDescricao());
+		Credor credor = credorRepository.loadCredorByDescricao(((Debitos)this.getModelo()).getCredorString());
 		assert credor != null : "Credor Não Encontrado";
 		((Debitos)this.getModelo()).add(credor);
 	}
 	
 	private void loadOrcamento() throws LoadOrcamentoException{
 		
-		int ano = ((Debitos)this.getModelo()).getOrcamento().getAno();
-		Mes mes =  ((Debitos)this.getModelo()).getOrcamento().getMes();
-		Orcamento orc = orcamentoRepository.loadOrcamentoBy(ano, mes);
+		Orcamento orc = orcamentoRepository.loadOrcamentoBy(((Debitos)this.getModelo()).getOrcamento());
 		assert orc != null : "Orcamento Não Encontrado";
 		((Debitos)this.getModelo()).add(orc);
 	}

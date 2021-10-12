@@ -46,11 +46,11 @@ public class DebitoDomain extends DefaultService<DebitoDTO, Debito> implements C
 		this.timer = timer;
 	}
 	
+	//Escuta a Fila do Kafka, papel de consumer, e responde ao tipoco de registrar novo debito
 	@KafkaListener(id = "${kafka.group.id.condif}", topics = "${kafka.topic}")
 	public Boolean resgistrarDebito(ConsumerRecord<?, ?> debitoConsumerRecord){
 		
 		Boolean result = false;
-		System.out.println("==> Inicar Registro de Novo Debito.");
 		logger.info("==> Inicar Registro de Novo Debito.");
 		
 		this.timer.startTime();
@@ -80,7 +80,6 @@ public class DebitoDomain extends DefaultService<DebitoDTO, Debito> implements C
 		
 		logger.info("==> Iniciar Push para Verificar Credor.");
 		this.pusher.push(this.pushVerificarCredorTopic, this.getRecordReceived());
-		System.out.println("Test");
 		logger.info("==> Finalizar Push Verificar Credor.");
 		return true;
 	}

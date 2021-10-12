@@ -18,8 +18,14 @@ public class KafkaProducer implements Pusher{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducer.class); 
 	
-	@Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+	
+    private private KafkaTemplate<String, String> kafkaTemplate;
+	
+    @Autowired
+	public KafkaProducer(KafkaTemplate<String, String> kafkaTemplate) {
+		
+		this.kafkaTemplate = kafkaTemplate;
+	}
 	
 	
 	@Override

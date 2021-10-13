@@ -4,6 +4,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -37,7 +38,7 @@ public class DebitoDomain extends DefaultService<DebitoDTO, Debito> implements C
 	
 	@Autowired
 	public DebitoDomain(@Value("${kafka.number.receiver.threads}") Integer numberReceiverThreads,
-			DebitoRepository debitosepository, Pusher pusher, @Value("${kafka.push.verificar.credor.topic}") String pushTopic, Timer timer) {
+			DebitoRepository debitosepository, @Qualifier("KAFKA_PRODUCER_PRD") Pusher pusher, @Value("${kafka.producer.verificar.credor.topic}") String pushTopic, Timer timer) {
 
 		super(numberReceiverThreads, DebitoDTO.class);
 		this.debitosepository = debitosepository;
@@ -47,7 +48,7 @@ public class DebitoDomain extends DefaultService<DebitoDTO, Debito> implements C
 	}
 	
 	//Escuta a Fila do Kafka, papel de consumer, e responde ao tipoco de registrar novo debito
-	@KafkaListener(id = "${kafka.group.id.condif}", topics = "${kafka.topic}")
+	@KafkaListener(id = "${kafka.group.id.condif}", topics = "${kafka.consumer.registrar.debito.topic}")
 	public Boolean resgistrarDebito(ConsumerRecord<?, ?> debitoConsumerRecord){
 		
 		Boolean result = false;

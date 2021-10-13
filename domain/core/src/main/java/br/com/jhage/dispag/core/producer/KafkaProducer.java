@@ -13,16 +13,16 @@ import org.springframework.stereotype.Component;
  * @since 10/10/2021
  *
  */
-@Component
+@Component("KAFKA_PRODUCER_PRD")
 public class KafkaProducer implements Pusher{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducer.class); 
 	
 	
-    private private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaTemplate<Integer, String> kafkaTemplate;
 	
     @Autowired
-	public KafkaProducer(KafkaTemplate<String, String> kafkaTemplate) {
+	public KafkaProducer(KafkaTemplate<Integer, String> kafkaTemplate) {
 		
 		this.kafkaTemplate = kafkaTemplate;
 	}

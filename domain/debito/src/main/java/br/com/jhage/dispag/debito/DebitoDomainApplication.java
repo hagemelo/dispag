@@ -6,7 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 import br.com.jhage.dispag.core.conf.KafkaConfig;
-import br.com.jhage.dispag.debito.repository.DebitoRepository;
+import br.com.jhage.dispag.core.producer.KafkaProducer;
+import br.com.jhage.dispag.core.timer.Timer;
 
 /**
  * 
@@ -17,7 +18,7 @@ import br.com.jhage.dispag.debito.repository.DebitoRepository;
 
 @EnableAutoConfiguration
 @SpringBootApplication
-@Import(value= {KafkaConfig.class})
+@Import(value= {KafkaConfig.class, KafkaProducer.class, Timer.class})
 public class DebitoDomainApplication {
 
 	public static void main(String[] args) {

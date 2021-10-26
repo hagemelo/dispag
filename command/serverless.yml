@@ -70,12 +70,12 @@ provider:
 functions:
   #==> COMMAND
   command-novodebito:
-        name: command-novodebito-lb
-        handler: command/novodebito-handler.novodebito
+        name: command-registrar-debito-lb
+        handler: command/registrar-debito-handler.registrarDebito
         events:
             - http:
                 method: post
-                path: command/novodebito
+                path: command/registrardebito
 
   command-pagardebito:
         name: command-pagardebito-lb

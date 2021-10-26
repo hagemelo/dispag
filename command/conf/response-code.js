@@ -37,7 +37,7 @@ let responseCode = {
           }
     },
 
-    acceptedWithThismessageReturn : function (event, msg){
+    acceptedWithThismessageReturn : function (msg){
         return {
             statusCode: ACCEPTED,
             body: JSON.stringify(

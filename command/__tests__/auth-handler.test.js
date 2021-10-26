@@ -1,4 +1,4 @@
-const commandAuth = require ("../auth/auth_handler")
+const commandAuth = require ("../auth/auth-handler")
 const mockedEnv = require('mocked-env')
 
 let restore = mockedEnv({

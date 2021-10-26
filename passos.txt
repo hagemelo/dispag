@@ -18,8 +18,9 @@ npx serverless config credentials --provider aws --key AKXXXXXXXX3725YYUHZ2 --se
 	npm i -D serverless-dotenv-plugin
 	npm install serverless-offline --save-dev
 	npm install --save-dev serverless-jest-plugin
-	
+	npm install -D serverless-plugin-typescript typescript
 	npm install kafka-node  
 	npm install jsonwebtoken
 	npm install uuid
 	npm install body-parser
+	npm i serverless-postgres

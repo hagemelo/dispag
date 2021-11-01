@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.jhage.dispag.core.dto.DebitoDTO;
-import br.com.jhage.dispag.core.producer.Pusher;
+import br.com.jhage.dispag.core.helper.TimerHelper;
 import br.com.jhage.dispag.core.service.DefaultService;
-import br.com.jhage.dispag.core.timer.Timer;
 import br.com.jhage.dispag.debito.modelo.Debito;
 import br.com.jhage.dispag.debito.repository.DebitoRepository;
+import br.com.jhage.dispag.debito.service.PusherService;
 
 
 /**
@@ -25,20 +25,19 @@ import br.com.jhage.dispag.debito.repository.DebitoRepository;
  * @since 10/09/2021
  *
  */
-
 @Service
 @Transactional
 public class DebitoDomain extends DefaultService<DebitoDTO, Debito> implements CommandLineRunner{
 
 	private static final Logger logger = LogManager.getLogger(DebitoDomain.class);
 	private final DebitoRepository  debitosepository;
-	private final Pusher pusher;
+	private final PusherService pusher;
 	private final String pushVerificarCredorTopic;
-	private final Timer timer;
+	private final TimerHelper timer;
 	
 	@Autowired
 	public DebitoDomain(@Value("${kafka.number.receiver.threads}") Integer numberReceiverThreads,
-			DebitoRepository debitosepository, @Qualifier("KAFKA_PRODUCER_PRD") Pusher pusher, @Value("${kafka.producer.verificar.credor.topic}") String pushTopic, Timer timer) {
+			DebitoRepository debitosepository, @Qualifier("KAFKA_PRODUCER_PRD") PusherService pusher, @Value("${kafka.producer.verificar.credor.topic}") String pushTopic, TimerHelper timer) {
 
 		super(numberReceiverThreads, DebitoDTO.class);
 		this.debitosepository = debitosepository;

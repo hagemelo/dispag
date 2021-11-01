@@ -1,6 +1,6 @@
 package br.com.jhage.dispag.debito;
 
-import br.com.jhage.dispag.core.producer.Pusher;
+import br.com.jhage.dispag.debito.service.PusherService;
 
 /**
  * 
@@ -8,12 +8,12 @@ import br.com.jhage.dispag.core.producer.Pusher;
  * @since 10/10/2021
  *
  */
-public class kafkaPusherImp implements Pusher{
+public class kafkaPusherImp implements PusherService{
 
 	
 	private Boolean executouPosh;
 	
-	public static Pusher newInstance() {
+	public static PusherService newInstance() {
 		
 		return new kafkaPusherImp();
 	}

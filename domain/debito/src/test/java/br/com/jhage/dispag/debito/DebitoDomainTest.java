@@ -5,10 +5,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import br.com.jhage.dispag.core.producer.Pusher;
-import br.com.jhage.dispag.core.timer.Timer;
+import br.com.jhage.dispag.core.helper.TimerHelper;
 import br.com.jhage.dispag.debito.domain.DebitoDomain;
+import br.com.jhage.dispag.debito.helper.TimerHelperDebitoDomainImp;
 import br.com.jhage.dispag.debito.repository.DebitoRepository;
+import br.com.jhage.dispag.debito.service.PusherService;
 
 
 public class DebitoDomainTest {
@@ -17,8 +18,8 @@ public class DebitoDomainTest {
 	@SuppressWarnings({ "rawtypes", "unused" })
 	private ConsumerRecord consumerRecord;
 	private DebitoRepository repository;
-	private Pusher pusher;
-	private Timer timer;
+	private PusherService pusher;
+	private TimerHelper timer;
 	
 	@Before
 	public void prepared() {
@@ -61,7 +62,7 @@ public class DebitoDomainTest {
 		System.out.println("==> Criar objeto alvo do teste.");
 		this.repository =  DebitoRepositoryImp.newInstance();
 		this.pusher = kafkaPusherImp.newInstance();
-		this.timer = Timer.newInstance();
+		this.timer = new TimerHelperDebitoDomainImp();
 		this.debitoDomain = new DebitoDomain(3, this.repository, this.pusher, "Teste", this.timer);
 	}
 	

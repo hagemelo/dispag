@@ -78,6 +78,8 @@ public class Debito implements JhageEntidade<Debito> {
 	@JsonFormat(pattern = "dd/MM/yyyy", timezone = "Brazil/East")
 	@Temporal(TemporalType.DATE)
 	private Date vencimento;
+	
+	public Debito() {}
 
 	public Debito(DebitoDTO debitoDTO) {
 
@@ -87,7 +89,8 @@ public class Debito implements JhageEntidade<Debito> {
 		this.estado = Estado.PENDENTE;
 	}
 
-	public Long getId() {
+	
+	public Long getById() {
 
 		return this.id;
 	}

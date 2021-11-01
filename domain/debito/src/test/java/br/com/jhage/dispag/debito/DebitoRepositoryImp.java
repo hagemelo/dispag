@@ -170,4 +170,34 @@ public class DebitoRepositoryImp implements DebitoRepository{
 		return false;
 	}
 
+	@Override
+	public <S extends Debito> List<S> saveAllAndFlush(Iterable<S> entities) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteAllInBatch(Iterable<Debito> entities) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteAllByIdInBatch(Iterable<Long> ids) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Debito getById(Long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteAllById(Iterable<? extends Long> ids) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

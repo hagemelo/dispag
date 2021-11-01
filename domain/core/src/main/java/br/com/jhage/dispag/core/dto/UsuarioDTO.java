@@ -26,6 +26,8 @@ public class UsuarioDTO {
 		this.senha = senha;
 	}
 	
+	public UsuarioDTO() {}
+	
 	public String getNome() {
 		return nome;
 	}

@@ -51,6 +51,8 @@ public class OrcamentoDTO {
 		
 	}
 	
+	public OrcamentoDTO() {}
+	
 
 	public Estado getEstado() {
 		return estado;

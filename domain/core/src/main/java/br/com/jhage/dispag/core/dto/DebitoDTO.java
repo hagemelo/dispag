@@ -39,7 +39,7 @@ public class DebitoDTO {
 
 	@JsonFormat(pattern = "dd/MM/yyyy", timezone = "Brazil/East")
 	private Date vencimento;
-
+	
 	public DebitoDTO(Double valor, Status status, Estado estado, String marcacao, CredorDTO credor,
 			OrcamentoDTO orcamento, Date vencimento) {
 

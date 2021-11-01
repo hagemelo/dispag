@@ -21,6 +21,7 @@ public class CredorDTO {
 	@Enumerated(EnumType.STRING)
 	Tipo tipo;
 	
+	public CredorDTO() {}
 	
 	public CredorDTO(String descricao, Tipo tipo) {
 		

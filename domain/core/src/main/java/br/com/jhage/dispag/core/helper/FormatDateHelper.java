@@ -4,8 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.springframework.context.annotation.Configuration;
-
 import br.com.jhage.dispag.core.exception.FormatDateHelperException;
 
 /***
@@ -14,7 +12,6 @@ import br.com.jhage.dispag.core.exception.FormatDateHelperException;
  * @since 09/01/2013
  * @version 1.0 Classe responsavel por fomata��o e valida��o de datas
  */
-@Configuration
 final public class FormatDateHelper {
 	
 	private FormatDateHelper() {}

@@ -1,0 +1,33 @@
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 20
+      arrivalRate: 1
+  processor: "Command-test.js"     
+scenarios:
+  - name: "Load Test Command"
+    flow:
+        - think: 2
+        - post:
+            name: "[1] Request - Autenticar"
+            url: "/dev/auth/login"
+            headers: 
+                Content-Type: "application/json"
+            json:
+                user: "Alex"
+                passwd: "1234"
+            beforeRequest: "logRequest"
+            afterResponse: "responseLogin"
+        - log: "Verificar UUID  {{ respuuid }}"
+        - post:
+            name: "[2] Request - registrar debito"
+            url: "/dev/command/registrardebito"
+            headers: 
+                Content-Type: "application/json"
+            json:
+                valor: "Alex"
+                marcacao: "1234"
+                vencimento:
+        - log: "Current environment is set to:"
+    
+       

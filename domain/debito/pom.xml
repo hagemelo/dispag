@@ -31,10 +31,39 @@
 			    <groupId>org.apache.maven.plugins</groupId>
 			    <artifactId>maven-resources-plugin</artifactId>
 			    <version>3.1.0</version>
-			</plugin>  
-		</plugins>
+			    <executions>
+		          <execution>
+		            <id>copy-resources</id>
+		            <!-- here the phase you need -->
+		            <phase>validate</phase>
+		            <goals>
+		              <goal>copy-resources</goal>
+		            </goals>
+		            <configuration>
+		              <outputDirectory>C:\Users\hagem\Documents\Desenvolvimento\dispag\infra\deployments\domaindebito</outputDirectory>
+		              <resources>          
+		                <resource>
+		                  <directory>${basedir}/target</directory>
+		                  <includes>
+                            <include>${project.build.finalName}.jar</include>
+                          </includes>
+		                  <filtering>true</filtering>
+		                </resource>
+		                <resource>
+		                  <directory>${basedir}</directory>
+		                  <includes>
+                            <include>Dockerfile</include>
+                          </includes>
+		                  <filtering>true</filtering>
+		                </resource>
+		              </resources>              
+		            </configuration>            
+		          </execution>
+		        </executions>
+		    </plugin>
+		</plugins>	
 	</build>
-
+		
 	<dependencies>
 	
 		<dependency>
